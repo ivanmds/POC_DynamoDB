@@ -11,6 +11,7 @@ namespace TestDynamodb.Repositories
     {
         public const string TABLE_NAME_EVENT = "Event";
         public const string INDEX_FIND_LAST_BY_ACCUNT = "IndexFindLastByAccount";
+        public const string INDEX_FIND_LAST_BY_CUSTOMERID = "IndexFindLastByCustomerId";
 
         private readonly IAmazonDynamoDB _dynamoDB;
 
@@ -63,28 +64,32 @@ namespace TestDynamodb.Repositories
                 var describe = await _dynamoDB.DescribeTableAsync(TABLE_NAME_EVENT);
 
                 //Exemplo de criação de um globalSecondaryIndex em uma tabela já existente.
-                string newIndex = $"{INDEX_FIND_LAST_BY_ACCUNT}New";
+                if (!describe.Table.GlobalSecondaryIndexes.Any(i => i.IndexName == INDEX_FIND_LAST_BY_CUSTOMERID))
+                    await CreateIndexFindLastByCustomerIdAsync(INDEX_FIND_LAST_BY_CUSTOMERID);
+            }
+        }
 
-                if (!describe.Table.GlobalSecondaryIndexes.Any(i => i.IndexName == newIndex))
-                {
-                    var updateTable = new UpdateTableRequest();
-                    updateTable.TableName = TABLE_NAME_EVENT;
+        private async Task CreateIndexFindLastByCustomerIdAsync(string indexName)
+        {
+            var updateTable = new UpdateTableRequest();
+            updateTable.TableName = TABLE_NAME_EVENT;
 
-                    updateTable.AttributeDefinitions = new List<AttributeDefinition>
+            updateTable.AttributeDefinitions = new List<AttributeDefinition>
                         {
-                            new AttributeDefinition("Name", ScalarAttributeType.S)
+                            new AttributeDefinition("DataCustomerId", ScalarAttributeType.S),
+                            new AttributeDefinition("DataId", ScalarAttributeType.S),
                         };
 
-                    updateTable.GlobalSecondaryIndexUpdates = new List<GlobalSecondaryIndexUpdate> {
+            updateTable.GlobalSecondaryIndexUpdates = new List<GlobalSecondaryIndexUpdate> {
                             new GlobalSecondaryIndexUpdate
                             {
                                  Create = new CreateGlobalSecondaryIndexAction
                                  {
-                                      IndexName = newIndex,
+                                      IndexName = indexName,
                                       KeySchema = new List<KeySchemaElement>
                                       {
-                                          new KeySchemaElement("Account", KeyType.HASH),
-                                          new KeySchemaElement("Name", KeyType.RANGE)
+                                          new KeySchemaElement("DataCustomerId", KeyType.HASH),
+                                          new KeySchemaElement("DataId", KeyType.RANGE)
                                       },
                                       ProvisionedThroughput = new ProvisionedThroughput(10, 5),
                                       Projection = new  Projection
@@ -95,9 +100,7 @@ namespace TestDynamodb.Repositories
                             }
                         };
 
-                    await _dynamoDB.UpdateTableAsync(updateTable);
-                }
-            }
+            await _dynamoDB.UpdateTableAsync(updateTable);
         }
     }
 }

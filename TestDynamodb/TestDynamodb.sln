@@ -9,7 +9,7 @@ Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-co
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{8E8CEA86-C303-4711-8816-6ABD05CB6D0C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestDynamodb.Test", "..\TestDynamodb.Test\TestDynamodb.Test.csproj", "{C4D73A37-9105-4F8D-B384-642438CC3A74}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestDynamodb.Test", "..\TestDynamodb.Test\TestDynamodb.Test.csproj", "{C4D73A37-9105-4F8D-B384-642438CC3A74}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

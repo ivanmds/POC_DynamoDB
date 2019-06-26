@@ -22,26 +22,32 @@ namespace TestDynamodb.Helpers
         {
             List<JProperty> properties = new List<JProperty>();
             foreach (KeyValuePair<string, AttributeValue> keyValue in item)
-            {
-                var keyValueParse = GetKeyValue(keyValue);
-                properties.Add(new JProperty(keyValueParse.Key, keyValueParse.Value));
-            }
+                properties.Add(GetKeyValue(keyValue));
 
             var obj = new JObject(properties);
             return JsonConvert.DeserializeObject<T>(obj.ToString());
         }
 
-        public static KeyValuePair<string, string> GetKeyValue(KeyValuePair<string, AttributeValue> keyValue)
+        public static JProperty GetKeyValue(KeyValuePair<string, AttributeValue> keyValue)
         {
             string key = keyValue.Key;
-            string value = null;
+            object value = null;
 
             if (!string.IsNullOrEmpty(keyValue.Value.S))
                 value = keyValue.Value.S;
 
+            else if (keyValue.Value?.M?.Count > 0)
+            {
+                var properties = new List<JProperty>();
+                foreach (KeyValuePair<string, AttributeValue> keyValueData in keyValue.Value.M)
+                    properties.Add(GetKeyValue(keyValueData));
+
+                value = new JObject(properties);
+            }
+
             //add more parse if you need.
 
-            return KeyValuePair.Create<string, string>(key, value);
+            return new JProperty(key, value);
         }
     }
 }

@@ -3,6 +3,7 @@ using Amazon.DynamoDBv2.Model;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TestDynamodb.Helpers;
+using TestDynamodb.Models;
 using TestDynamodb.Repositories.Interfaces;
 
 namespace TestDynamodb.Repositories
@@ -14,12 +15,12 @@ namespace TestDynamodb.Repositories
         public EventRepository(IAmazonDynamoDB dynamoDB) => _dynamoDB = dynamoDB;
 
 
-        public async Task<IEnumerable<object>> ListEventsAsync(string account)
+        public async Task<IEnumerable<Event>> ListEventsAsync(string account)
         {
             QueryRequest request = QueryListEvents(account);
             QueryResponse response = await _dynamoDB.QueryAsync(request);
             if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
-                return QueryResponseParse.GetListItems(response);
+                return QueryResponseParse.GetListItems<Event>(response);
 
             return null;
         }

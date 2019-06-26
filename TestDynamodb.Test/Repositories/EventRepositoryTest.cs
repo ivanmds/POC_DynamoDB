@@ -46,7 +46,13 @@ namespace TestDynamodb.Test.Repositories
             @event.Add("CreatedAt", new AttributeValue(DateTime.Now.ToString()));
             @event.Add("Account", new AttributeValue("123456789"));
 
-           await _dynamoDB.PutItemAsync(RegisterTables.TABLE_NAME_EVENT, @event);
+            var dataEvent = new Dictionary<string, AttributeValue>();
+            dataEvent.Add("CustomerId", new AttributeValue("123456"));
+            dataEvent.Add("Description", new AttributeValue("Teste"));
+
+            @event.Add("Data", new AttributeValue { M = dataEvent });
+            
+            await _dynamoDB.PutItemAsync(RegisterTables.TABLE_NAME_EVENT, @event);
         }
     }
 }
