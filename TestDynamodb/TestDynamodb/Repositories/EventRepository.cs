@@ -20,7 +20,7 @@ namespace TestDynamodb.Repositories
             QueryRequest request = QueryListEvents(account);
             QueryResponse response = await _dynamoDB.QueryAsync(request);
             if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
-                return QueryResponseParse.GetListItems<Event>(response);
+                return EventParse.Parse(response);
 
             return null;
         }

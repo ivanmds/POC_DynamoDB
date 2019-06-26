@@ -1,28 +1,44 @@
-﻿using Amazon.DynamoDBv2.Model;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Amazon.DynamoDBv2.Model;
 using System.Collections.Generic;
 
 namespace TestDynamodb.Helpers
 {
-    public static class QueryResponseParse
+    public static class BuildObject
     {
-        public static IEnumerable<object> GetListItems(QueryResponse response)
-        {
-            return GetListItems<object>(response);
-        }
-        public static IEnumerable<T> GetListItems<T>(QueryResponse response)
+        public static IEnumerable<T> GetList<T>(QueryResponse response)
         {
             if (response?.Items?.Count > 0)
                 foreach (Dictionary<string, AttributeValue> item in response.Items)
-                    yield return GetItem<T>(item);
+                    yield return Get<T>(item);
         }
 
-        public static T GetItem<T>(Dictionary<string, AttributeValue> item)
+        public static T Get<T>(Dictionary<string, AttributeValue> item)
+        {
+            return Get<T>(item);
+        }
+
+        public static object Get(IEnumerable<KeyValuePair<string, AttributeValue>> item)
+        {
+            return Get<object>(item);
+        }
+
+        public static T Get<T>(IEnumerable<KeyValuePair<string, AttributeValue>> item)
         {
             List<JProperty> properties = new List<JProperty>();
             foreach (KeyValuePair<string, AttributeValue> keyValue in item)
                 properties.Add(GetKeyValue(keyValue));
+
+            var obj = new JObject(properties);
+            return JsonConvert.DeserializeObject<T>(obj.ToString());
+        }
+
+        public static T Get<T>(Dictionary<string, string> item)
+        {
+            List<JProperty> properties = new List<JProperty>();
+            foreach (KeyValuePair<string, string> keyValue in item)
+                properties.Add(new JProperty(keyValue.Key, keyValue.Value));
 
             var obj = new JObject(properties);
             return JsonConvert.DeserializeObject<T>(obj.ToString());
