@@ -47,13 +47,24 @@ namespace TestDynamodb.Test.Repositories
             @event.Add("Account", new AttributeValue("123456789"));
             @event.Add("CustomerId", new AttributeValue("customerId 123456"));
             @event.Add("Description", new AttributeValue("description test"));
+            @event.Add("ClientID_1", new AttributeValue("ClientId test"));
+            @event.Add("ClientID_2", new AttributeValue("ClientId test"));
+            @event.Add("ClientID_3", new AttributeValue("ClientId test"));
+            @event.Add("ClientID_4", new AttributeValue("ClientId test"));
+            @event.Add("ClientID_5", new AttributeValue("ClientId test"));
+            @event.Add("ClientID_6", new AttributeValue("ClientId test"));
+            @event.Add("ClientID_7", new AttributeValue("ClientId test"));
+            @event.Add("ClientID_8", new AttributeValue("ClientId test"));
+            @event.Add("ClientID_9", new AttributeValue("ClientId test"));
+            @event.Add("ClientID_10", new AttributeValue("ClientId test"));
+            @event.Add("ClientID_11", new AttributeValue("ClientId test"));
 
             //Modelo para conter um objeto filho
-            //var dataEvent = new Dictionary<string, AttributeValue>();
-            //dataEvent.Add("CustomerId", new AttributeValue("123456"));
-            //dataEvent.Add("Description", new AttributeValue("Teste"));
+            var dataEvent = new Dictionary<string, AttributeValue>();
+            dataEvent.Add("DDD", new AttributeValue("11"));
+            dataEvent.Add("Numero", new AttributeValue("123456789"));
 
-            //@event.Add("Data", new AttributeValue { M = dataEvent });
+            @event.Add("Telefones", new AttributeValue { M = dataEvent });
 
             await _dynamoDB.PutItemAsync(RegisterTables.TABLE_NAME_EVENT, @event);
         }
