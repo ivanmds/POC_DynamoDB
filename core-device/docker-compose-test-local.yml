@@ -1,0 +1,29 @@
+version: '3.4'
+
+services:
+  core.device:
+    image: coredevicetests
+    build:
+        context: .
+        dockerfile: test/Core.Device.Tests/Dockerfile
+    depends_on:
+        - rabbit
+        - dynamodb
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "80"
+  entrypoint: 'dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:Include="[Core.Device.*]*"'
+  dynamodb:
+    image: amazon/dynamodb-local
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      AWS_ACCESS_KEY_ID: root
+      AWS_SECRET_ACCESS_KEY: secret
+  rabbit:
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672"
+      - "5672:5672"

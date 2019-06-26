@@ -1,0 +1,16 @@
+version: '3.4'
+
+services:
+  testdynamodb:
+    image: ${DOCKER_REGISTRY-}testdynamodb
+    build:
+      context: .
+      dockerfile: TestDynamodb/Dockerfile
+  dynamodb:
+    image: amazon/dynamodb-local
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      AWS_ACCESS_KEY_ID: root
+      AWS_SECRET_ACCESS_KEY: secret

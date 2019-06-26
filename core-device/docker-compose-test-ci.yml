@@ -1,0 +1,25 @@
+version: '3.4'
+
+services:
+  core.device.test:
+    image: mcr.microsoft.com/dotnet/core/sdk:2.2
+    build:
+      context: .
+      dockerfile: test/Core.Device.Tests/Dockerfile
+    ports:
+      - "80"
+    entrypoint: 'dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:Include="[Core.Device.*]*"'
+    environment:
+      - TZ=America/Sao_Paulo
+      - DynamoDB__AccessKey=root
+      - DynamoDB__SecretKey=secret      
+      - DynamoDB__ServiceURL=http://dynamodb:8000
+      - DefaultTimeTopt__Range=60
+      - DefaultTimeTopt__Size=6
+    depends_on:
+      - dynamodb
+  dynamodb:
+    image: amazon/dynamodb-local
+    restart: always
+    ports:
+      - "8000:8000"
