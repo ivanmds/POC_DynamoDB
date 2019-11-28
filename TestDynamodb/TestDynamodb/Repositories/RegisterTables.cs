@@ -10,17 +10,25 @@ namespace TestDynamodb.Repositories
     public class RegisterTables : IRegisterTables
     {
         public const string TABLE_NAME_EVENT = "Event";
+        public const string TABLE_NAME_PERSON = "Person";
         public const string INDEX_FIND_LAST_BY_ACCUNT = "IndexFindLastByAccount";
         public const string INDEX_FIND_LAST_BY_CUSTOMERID = "IndexFindLastByCustomerId";
 
         private readonly IAmazonDynamoDB _dynamoDB;
-
+        private ListTablesResponse _tables;
         public RegisterTables(IAmazonDynamoDB dynamoDB)
         {
             _dynamoDB = dynamoDB;
         }
 
         public async Task RegisterAsync()
+        {
+            _tables = await _dynamoDB.ListTablesAsync();
+            await CreateTableEvent();
+            await CreateTablePerson();
+        }
+
+        private async Task CreateTableEvent()
         {
             var request = new CreateTableRequest
             {
@@ -56,8 +64,7 @@ namespace TestDynamodb.Repositories
                 }
             };
 
-            var tables = await _dynamoDB.ListTablesAsync();
-            if (!tables.TableNames.Contains(TABLE_NAME_EVENT))
+            if (!_tables.TableNames.Contains(TABLE_NAME_EVENT))
                 await _dynamoDB.CreateTableAsync(request);
             else
             {
@@ -67,6 +74,26 @@ namespace TestDynamodb.Repositories
                 if (!describe.Table.GlobalSecondaryIndexes.Any(i => i.IndexName == INDEX_FIND_LAST_BY_CUSTOMERID))
                     await CreateIndexFindLastByCustomerIdAsync(INDEX_FIND_LAST_BY_CUSTOMERID);
             }
+        }
+
+        private async Task CreateTablePerson()
+        {
+            var request = new CreateTableRequest
+            {
+                TableName = TABLE_NAME_PERSON,
+                AttributeDefinitions = new List<AttributeDefinition>()
+                {
+                    new AttributeDefinition("Id", ScalarAttributeType.S)
+                },
+                KeySchema = new List<KeySchemaElement>()
+                {
+                    new KeySchemaElement("Id", KeyType.HASH)
+                },
+                ProvisionedThroughput = new ProvisionedThroughput(10, 5),
+            };
+
+            if (!_tables.TableNames.Contains(TABLE_NAME_PERSON))
+                await _dynamoDB.CreateTableAsync(request);
         }
 
         private async Task CreateIndexFindLastByCustomerIdAsync(string indexName)
