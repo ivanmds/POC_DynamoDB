@@ -11,6 +11,7 @@ namespace TestDynamodb.Repositories
     {
         public const string TABLE_NAME_EVENT = "Event";
         public const string TABLE_NAME_PERSON = "Person";
+        public const string TABLE_NAME_COMPANY = "Company";
         public const string INDEX_FIND_LAST_BY_ACCUNT = "IndexFindLastByAccount";
         public const string INDEX_FIND_LAST_BY_CUSTOMERID = "IndexFindLastByCustomerId";
 
@@ -26,6 +27,7 @@ namespace TestDynamodb.Repositories
             _tables = await _dynamoDB.ListTablesAsync();
             await CreateTableEvent();
             await CreateTablePerson();
+            await CreateTableCompany();
         }
 
         private async Task CreateTableEvent()
@@ -93,6 +95,26 @@ namespace TestDynamodb.Repositories
             };
 
             if (!_tables.TableNames.Contains(TABLE_NAME_PERSON))
+                await _dynamoDB.CreateTableAsync(request);
+        }
+
+        private async Task CreateTableCompany()
+        {
+            var request = new CreateTableRequest
+            {
+                TableName = TABLE_NAME_COMPANY,
+                AttributeDefinitions = new List<AttributeDefinition>()
+                {
+                    new AttributeDefinition("Id", ScalarAttributeType.S)
+                },
+                KeySchema = new List<KeySchemaElement>()
+                {
+                    new KeySchemaElement("Id", KeyType.HASH)
+                },
+                ProvisionedThroughput = new ProvisionedThroughput(10, 5),
+            };
+
+            if (!_tables.TableNames.Contains(TABLE_NAME_COMPANY))
                 await _dynamoDB.CreateTableAsync(request);
         }
 
