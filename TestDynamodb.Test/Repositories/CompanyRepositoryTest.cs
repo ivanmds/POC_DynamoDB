@@ -50,8 +50,27 @@ namespace TestDynamodb.Test.Repositories
             await _repository.SaveAsync(company);
             var companyFound = await _repository.GetAsync(company.Id);
 
+            Company companyUpdated = null;
+
+            if (companyFound != null)
+            {
+                companyFound.Name = "Teste 2";
+                companyFound.Phones.Add(new Phone { DDD = "11", Number = "123456789" });
+
+                companyFound.Addresses.Add(new Address { City = "SP", State = "São Paulo", Number = "123", Street = "Rua", ZipCode = "1023456" });
+
+                companyFound.Partners.Clear();
+
+                await _repository.SaveAsync(companyFound);
+                companyUpdated = await _repository.GetAsync(company.Id);
+            }
+
             //assert
             Assert.NotNull(companyFound);
+            Assert.NotNull(companyUpdated);
+            Assert.Equal(3, companyUpdated.Phones.Count);
+            Assert.Equal(3, companyUpdated.Addresses.Count);
+            Assert.Equal(0, companyUpdated.Partners.Count);
         }
     }
 }
