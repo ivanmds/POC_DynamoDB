@@ -12,6 +12,10 @@ namespace TestDynamodb.Repositories
         public const string TABLE_NAME_EVENT = "Event";
         public const string TABLE_NAME_PERSON = "Person";
         public const string TABLE_NAME_COMPANY = "Company";
+        public const string TABLE_NAME_CARD = "Card";
+
+        public const string INDEX_FIND_CARD = "IndexFindCard";
+
         public const string INDEX_FIND_LAST_BY_ACCUNT = "IndexFindLastByAccount";
         public const string INDEX_FIND_LAST_BY_CUSTOMERID = "IndexFindLastByCustomerId";
 
@@ -25,9 +29,48 @@ namespace TestDynamodb.Repositories
         public async Task RegisterAsync()
         {
             _tables = await _dynamoDB.ListTablesAsync();
+            await CreateTableCard();
             await CreateTableEvent();
             await CreateTablePerson();
             await CreateTableCompany();
+        }
+
+        private async Task CreateTableCard()
+        {
+            var request = new CreateTableRequest
+            {
+                TableName = TABLE_NAME_CARD,
+                AttributeDefinitions = new List<AttributeDefinition>()
+                {
+                     new AttributeDefinition("CardId", ScalarAttributeType.S),
+                     new AttributeDefinition("IndexUserCard", ScalarAttributeType.S)
+                },
+                KeySchema = new List<KeySchemaElement>()
+                {
+                    new KeySchemaElement("CardId", KeyType.HASH),
+                },
+                ProvisionedThroughput = new ProvisionedThroughput(10, 5),
+                GlobalSecondaryIndexes = new List<GlobalSecondaryIndex>()
+                {
+                    new GlobalSecondaryIndex()
+                    {
+                        IndexName = INDEX_FIND_CARD,
+                        KeySchema = new List<KeySchemaElement>()
+                        {
+                            new KeySchemaElement("IndexUserCard", KeyType.HASH),
+                            new KeySchemaElement("CardId", KeyType.RANGE)
+                        },
+                        ProvisionedThroughput = new ProvisionedThroughput(10, 5),
+                        Projection = new Projection
+                        {
+                            ProjectionType = ProjectionType.ALL
+                        }
+                    }
+                }
+            };
+
+            if (!_tables.TableNames.Contains(TABLE_NAME_CARD))
+                await _dynamoDB.CreateTableAsync(request);
         }
 
         private async Task CreateTableEvent()

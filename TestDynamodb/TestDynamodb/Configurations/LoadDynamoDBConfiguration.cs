@@ -14,20 +14,21 @@ namespace TestDynamodb.Configurations
         {
             if (!hostingEnvironment.IsProduction())
             {
-                services.AddScoped<IAmazonDynamoDB>(x =>
+                var dynamoConfig = configuration.GetSection("DynamoDB").Get<DynamoDBConfiguration>();
+
+                services.AddSingleton<IAmazonDynamoDB>(x =>
                 {
-                    var dynamoConfig = configuration.GetSection("ConnectionStrings:DynamoDB").Get<DynamoDBConfiguration>();
                     var clientConfig = new AmazonDynamoDBConfig { ServiceURL = dynamoConfig.ServiceURL };
 
                     return new AmazonDynamoDBClient(dynamoConfig.AccessKey, dynamoConfig.SecretKey, clientConfig);
                 });
             }
             else
-                services.AddScoped<IAmazonDynamoDB>(x => new AmazonDynamoDBClient());
+                services.AddSingleton<IAmazonDynamoDB>(x => new AmazonDynamoDBClient());
 
 
-            services.AddScoped<IDynamoDBContext, DynamoDBContext>();
-            services.AddScoped<IRegisterTables, RegisterTables>();
+            services.AddSingleton<IDynamoDBContext, DynamoDBContext>();
+            services.AddSingleton<IRegisterTables, RegisterTables>();
 
             if (hostingEnvironment.IsProduction())
                 services.AddDefaultAWSOptions(configuration.GetAWSOptions());

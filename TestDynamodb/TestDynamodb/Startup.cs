@@ -5,8 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TestDynamodb.Configurations;
 using TestDynamodb.Initializers;
-using TestDynamodb.Repositories;
-using TestDynamodb.Repositories.Interfaces;
 
 namespace TestDynamodb
 {
@@ -27,7 +25,7 @@ namespace TestDynamodb
             services.AddDynamoDB(HostingEnvironment, Configuration);
             services.AddAsyncInitializer<DynamoDBAsyncInitializer>();
 
-            services.AddScoped<IEventRepository, EventRepository>();
+            //services.AddScoped<IEventRepository, EventRepository>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
