@@ -40,7 +40,7 @@ namespace TestDynamodb.Models
 
         public static string BuildIndexUserCard(string companyKey, string documentNumber, string account)
         {
-            if(string.IsNullOrEmpty(companyKey) && string.IsNullOrEmpty(documentNumber) && string.IsNullOrEmpty(account))
+            if(!string.IsNullOrEmpty(companyKey) && !string.IsNullOrEmpty(documentNumber) && !string.IsNullOrEmpty(account))
                 return $"{companyKey?.ToUpper()}#{documentNumber?.ToUpper()}#{account?.ToUpper()}";
 
             return null;

@@ -39,5 +39,54 @@ namespace TestDynamodb.Test.Repositories
             Assert.NotNull(cardFound);
         }
 
+        [Fact]
+        public async Task SaveAndGetIndexUserCard()
+        {
+            //arrange
+            var card = new Card
+            {
+                CompanyKey = "Acesso",
+                ActivateCode = Guid.NewGuid().ToString(),
+                DocumentNumber = Guid.NewGuid().ToString(),
+                BankAgency = "0001",
+                BanckAccount = "123456"
+            };
+            card.LoadIds();
+
+            //act
+            await _repository.SaveAsync(card);
+            var cardFound = await _repository.GetIndexUserCardAsync(card.IndexUserCard);
+
+            //assert
+            Assert.NotNull(cardFound);
+        }
+
+        [Fact]
+        public async Task SaveAndGetIndexUserCard2()
+        {
+            //arrange
+            var card = new Card
+            {
+                CompanyKey = "Acesso",
+                ActivateCode = Guid.NewGuid().ToString()
+            };
+            card.LoadIds();
+
+            //act
+            await _repository.SaveAsync(card);
+            var cardFound = await _repository.GetAsync(card.CardId);
+
+            cardFound.DocumentNumber = Guid.NewGuid().ToString();
+            cardFound.BankAgency = "0001";
+            cardFound.BanckAccount = "123456";
+            cardFound.LoadIds();
+
+            await _repository.SaveAsync(cardFound);
+            var cardFound2 = await _repository.GetIndexUserCardAsync(cardFound.IndexUserCard);
+
+            //assert
+            Assert.NotNull(cardFound2);
+        }
+
     }
 }
